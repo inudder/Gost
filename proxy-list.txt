@@ -8,3 +8,4 @@ www.gstatic.com
 www.youtube.com
 yt3.ggpht.com
 m.youtube.com
+chatgpt.com
