@@ -2,9 +2,9 @@ accounts.youtube.com
 fonts.googleapis.com
 fonts.gstatic.com
 i.ytimg.com
-googlevideo.com
 studio.youtube.com
 www.google.com
 www.gstatic.com
 www.youtube.com
 yt3.ggpht.com
+m.youtube.com
