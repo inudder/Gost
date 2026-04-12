@@ -1,0 +1,104 @@
+<div class="space-y-6">
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">GOST API</p>
+      <p class="mt-3 text-xl font-semibold text-white">{{ stats.gost_api_status }}</p>
+    </article>
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Total</p>
+      <p class="mt-3 text-3xl font-semibold text-white">{{ stats.total_nodes }}</p>
+    </article>
+    <article class="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-emerald-200/70">Online</p>
+      <p class="mt-3 text-3xl font-semibold text-emerald-100">{{ stats.online_nodes }}</p>
+    </article>
+    <article class="rounded-3xl border border-rose-500/20 bg-rose-500/10 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-rose-200/70">Offline</p>
+      <p class="mt-3 text-3xl font-semibold text-rose-100">{{ stats.offline_nodes }}</p>
+    </article>
+    <article class="rounded-3xl border border-amber-500/20 bg-amber-500/10 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-amber-200/70">Degraded</p>
+      <p class="mt-3 text-3xl font-semibold text-amber-100">{{ stats.degraded_nodes }}</p>
+    </article>
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Avg latency</p>
+      <p class="mt-3 text-2xl font-semibold text-white">{{ stats.avg_latency_ms|latency }}</p>
+      <p class="mt-1 text-xs text-slate-500">Last full cycle: {{ stats.last_global_check_at|datetime }}</p>
+    </article>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <form hx-post="/nodes/actions/check-all" hx-target="#dashboard-alert" hx-swap="innerHTML">
+      <button type="submit" class="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-100 hover:bg-cyan-500/20">
+        Check all enabled nodes
+      </button>
+    </form>
+    <a href="/nodes/new" class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 hover:bg-white/10">
+      Add new SOCKS5 proxy
+    </a>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-2">
+    <section class="rounded-3xl border border-white/10 bg-panel/80 p-5">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-white">Latest Errors</h2>
+        <span class="text-xs text-slate-500">most recent failures</span>
+      </div>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="text-left text-xs uppercase tracking-[0.2em] text-slate-500">
+            <tr>
+              <th class="pb-3 pr-4">Node</th>
+              <th class="pb-3 pr-4">Status</th>
+              <th class="pb-3 pr-4">Stage</th>
+              <th class="pb-3">Started</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {% for check, node in recent_errors %}
+              <tr>
+                <td class="py-3 pr-4 text-slate-200"><a href="/nodes/{{ node.id }}" class="hover:text-white">{{ node.name }}</a></td>
+                <td class="py-3 pr-4"><span class="rounded-full px-2.5 py-1 text-xs ring-1 {{ status_badge_class(check.status) }}">{{ check.status }}</span></td>
+                <td class="py-3 pr-4 text-slate-400">{{ check.failed_stage or '—' }}</td>
+                <td class="py-3 text-slate-400">{{ check.started_at|datetime }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="py-6 text-center text-sm text-slate-500">No errors recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="rounded-3xl border border-white/10 bg-panel/80 p-5">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-white">Latest Checks</h2>
+        <span class="text-xs text-slate-500">last 10 results</span>
+      </div>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="text-left text-xs uppercase tracking-[0.2em] text-slate-500">
+            <tr>
+              <th class="pb-3 pr-4">Node</th>
+              <th class="pb-3 pr-4">Status</th>
+              <th class="pb-3 pr-4">Latency</th>
+              <th class="pb-3">Started</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {% for check, node in recent_checks %}
+              <tr>
+                <td class="py-3 pr-4 text-slate-200"><a href="/nodes/{{ node.id }}" class="hover:text-white">{{ node.name }}</a></td>
+                <td class="py-3 pr-4"><span class="rounded-full px-2.5 py-1 text-xs ring-1 {{ status_badge_class(check.status) }}">{{ check.status }}</span></td>
+                <td class="py-3 pr-4 text-slate-400">{{ check.latency_ms|latency }}</td>
+                <td class="py-3 text-slate-400">{{ check.started_at|datetime }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="py-6 text-center text-sm text-slate-500">Checks will appear here after the first run.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

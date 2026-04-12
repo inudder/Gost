@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gost-panel"
+version = "0.1.0"
+description = "Local Windows panel for GOST service monitoring and SOCKS5 verification"
+readme = "README.md"
+requires-python = "==3.14.*"
+dependencies = [
+  "aiosqlite>=0.21,<1",
+  "fastapi>=0.116,<1",
+  "httpx[socks]>=0.28,<1",
+  "jinja2>=3.1,<4",
+  "pydantic-settings>=2.11,<3",
+  "python-multipart>=0.0.20,<1",
+  "sqlalchemy>=2.0,<3",
+  "uvicorn[standard]>=0.35,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.12,<1",
+]
+
+[project.scripts]
+gost-panel = "app.main:run"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+app = [
+  "templates/**/*.html",
+  "static/**/*",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

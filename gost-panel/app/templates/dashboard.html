@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | {{ app_title }}{% endblock %}
+{% block content %}
+<section class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-white">Dashboard</h1>
+      <p class="text-sm text-slate-400">Current GOST API health, latest checks, and quick actions.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/nodes/new" class="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-100 hover:bg-cyan-500/20">Add SOCKS5 proxy</a>
+      <a href="/gost" class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 hover:bg-white/10">GOST status</a>
+    </div>
+  </div>
+  <div id="dashboard-alert"></div>
+  <div
+    id="dashboard-panel"
+    hx-get="/partials/dashboard"
+    hx-trigger="load, every 15s"
+    hx-swap="innerHTML">
+  </div>
+</section>
+{% endblock %}

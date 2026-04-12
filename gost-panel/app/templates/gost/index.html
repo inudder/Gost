@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}GOST | {{ app_title }}{% endblock %}
+{% block content %}
+<section class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-white">GOST Integration</h1>
+      <p class="text-sm text-slate-400">API availability, imported services, and last successful poll.</p>
+    </div>
+    <form hx-post="/gost/poll" hx-target="#gost-panel" hx-swap="outerHTML">
+      <button type="submit" class="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-100 hover:bg-cyan-500/20">
+        Poll GOST now
+      </button>
+    </form>
+  </div>
+  <div id="gost-panel" hx-get="/gost/partials/panel" hx-trigger="load, every 20s" hx-swap="outerHTML"></div>
+</section>
+{% endblock %}

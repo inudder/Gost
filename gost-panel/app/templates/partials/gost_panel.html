@@ -1,0 +1,55 @@
+<div id="gost-panel" class="space-y-6">
+  {% include "partials/alert.html" %}
+  <section class="grid gap-4 lg:grid-cols-4">
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-5 lg:col-span-2">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">API URL</p>
+      <p class="mt-3 break-all text-base text-white">{{ settings.gost_api_url or 'Not configured' }}</p>
+      <p class="mt-2 text-xs text-slate-500">Basic auth: {% if settings.gost_api_username %}configured{% else %}disabled{% endif %}</p>
+    </article>
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-5">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Last poll</p>
+      <p class="mt-3 text-xl font-semibold text-white">{{ settings.last_gost_poll_at|datetime }}</p>
+    </article>
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-5">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">API state</p>
+      {% set state = 'error' if settings.last_gost_error else 'connected' if settings.gost_api_url else 'not_configured' %}
+      <p class="mt-3"><span class="rounded-full px-2.5 py-1 text-xs ring-1 {{ status_badge_class('offline' if state == 'error' else 'online' if state == 'connected' else 'unknown') }}">{{ state }}</span></p>
+      <p class="mt-2 text-xs text-slate-500">{{ settings.last_gost_error or 'GOST API has no recorded error.' }}</p>
+    </article>
+  </section>
+
+  <section class="rounded-3xl border border-white/10 bg-panel/80 p-5">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-white">Imported Services</h2>
+      <span class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ services|length }} items</span>
+    </div>
+    <div class="mt-4 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-xs uppercase tracking-[0.2em] text-slate-500">
+          <tr>
+            <th class="pb-3 pr-4">Name</th>
+            <th class="pb-3 pr-4">Address</th>
+            <th class="pb-3 pr-4">Protocol</th>
+            <th class="pb-3 pr-4">State</th>
+            <th class="pb-3 pr-4">Last seen</th>
+            <th class="pb-3">Error</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          {% for service in services %}
+            <tr>
+              <td class="py-3 pr-4 text-slate-200">{{ service.service_name }}</td>
+              <td class="py-3 pr-4 text-slate-400">{{ service.address or '—' }}</td>
+              <td class="py-3 pr-4 text-slate-400">{{ service.protocol or '—' }}</td>
+              <td class="py-3 pr-4"><span class="rounded-full px-2.5 py-1 text-xs ring-1 {{ status_badge_class('online' if service.state in ['running', 'online', 'ready'] else 'unknown') }}">{{ service.state or 'unknown' }}</span></td>
+              <td class="py-3 pr-4 text-slate-400">{{ service.last_seen_at|datetime }}</td>
+              <td class="py-3 text-slate-400">{{ service.error_note or '—' }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="py-6 text-center text-sm text-slate-500">No services cached yet. Configure the API URL and run a poll.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

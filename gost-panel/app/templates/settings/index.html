@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Settings | {{ app_title }}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-white">Settings</h1>
+    <p class="text-sm text-slate-400">GOST API connection, test endpoints, timeouts, and scheduler defaults.</p>
+  </div>
+
+  {% if errors %}
+    <div class="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-100">
+      {% for error in errors %}
+        <p>{{ error.loc[-1] }}: {{ error.msg }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" class="grid gap-6 rounded-3xl border border-white/10 bg-panel/80 p-6 lg:grid-cols-2">
+    <label class="space-y-2 lg:col-span-2">
+      <span class="text-sm text-slate-300">GOST API URL</span>
+      <input type="text" name="gost_api_url" value="{{ settings.gost_api_url or '' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">GOST API username</span>
+      <input type="text" name="gost_api_username" value="{{ settings.gost_api_username or '' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">GOST API password</span>
+      <input type="password" name="gost_api_password" value="" placeholder="Leave blank to keep current secret" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">HTTP test endpoint</span>
+      <input type="text" name="test_endpoint" value="{{ settings.test_endpoint }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Egress IP endpoint</span>
+      <input type="text" name="egress_ip_endpoint" value="{{ settings.egress_ip_endpoint }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Default timeout (ms)</span>
+      <input type="number" name="default_timeout_ms" value="{{ settings.default_timeout_ms }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Polling interval (sec)</span>
+      <input type="number" name="polling_interval_sec" value="{{ settings.polling_interval_sec }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Max concurrent checks</span>
+      <input type="number" name="max_concurrent_checks" value="{{ settings.max_concurrent_checks }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Degrade latency threshold (ms)</span>
+      <input type="number" name="degrade_latency_ms" value="{{ settings.degrade_latency_ms }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <div class="lg:col-span-2">
+      <button type="submit" class="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-5 py-3 text-sm text-cyan-100 hover:bg-cyan-500/20">Save settings</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

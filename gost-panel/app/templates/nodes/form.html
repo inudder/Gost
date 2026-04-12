@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'edit' %}Edit Node{% else %}New Node{% endif %} | {{ app_title }}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl space-y-6">
+  <div class="flex items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-white">{% if mode == 'edit' %}Edit node{% else %}Add SOCKS5 proxy{% endif %}</h1>
+      <p class="text-sm text-slate-400">Passwords stay hidden in the UI. Leave the password field blank to keep the existing secret.</p>
+    </div>
+    <a href="/nodes" class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 hover:bg-white/10">Back</a>
+  </div>
+
+  {% if errors %}
+    <div class="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-100">
+      {% for error in errors %}
+        <p>{{ error.loc[-1] }}: {{ error.msg }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% if mode == 'edit' %}/nodes/{{ node.id }}{% else %}/nodes{% endif %}" class="grid gap-6 rounded-3xl border border-white/10 bg-panel/80 p-6 lg:grid-cols-2">
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Label / name</span>
+      <input type="text" name="name" value="{{ node.name if node else '' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Protocol</span>
+      <input type="text" name="protocol" value="{{ node.protocol if node else 'socks5' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Host</span>
+      <input type="text" name="host" value="{{ node.host if node else '' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Port</span>
+      <input type="number" name="port" value="{{ node.port if node else 1080 }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Username</span>
+      <input type="text" name="username" value="{{ node.username if node else '' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Password</span>
+      <input type="password" name="password" value="" placeholder="{% if node and node.password %}Stored but hidden{% else %}Optional{% endif %}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2 lg:col-span-2">
+      <span class="text-sm text-slate-300">Notes</span>
+      <textarea name="notes" rows="4" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">{{ node.notes if node else '' }}</textarea>
+    </label>
+    <label class="space-y-2 lg:col-span-2">
+      <span class="text-sm text-slate-300">Tags</span>
+      <input type="text" name="tags" value="{{ node.tags if node else '' }}" placeholder="prod, europe, temp" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Test URL override</span>
+      <input type="text" name="test_url_override" value="{{ node.test_url_override if node else '' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="space-y-2">
+      <span class="text-sm text-slate-300">Timeout override (ms)</span>
+      <input type="number" name="timeout_override_ms" value="{{ node.timeout_override_ms if node and node.timeout_override_ms else '' }}" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white">
+    </label>
+    <label class="flex items-center gap-3 lg:col-span-2">
+      <input type="checkbox" name="enabled" value="true" {% if not node or node.enabled %}checked{% endif %} class="h-4 w-4 rounded border-white/10 bg-slate-950/60 text-cyan-400">
+      <span class="text-sm text-slate-300">Enabled</span>
+    </label>
+    <div class="lg:col-span-2">
+      <button type="submit" class="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-5 py-3 text-sm text-cyan-100 hover:bg-cyan-500/20">{% if mode == 'edit' %}Save changes{% else %}Create proxy{% endif %}</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

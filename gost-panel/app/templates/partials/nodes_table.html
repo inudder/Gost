@@ -1,0 +1,60 @@
+<div id="nodes-table" class="space-y-4">
+  {% include "partials/alert.html" %}
+  <section class="overflow-hidden rounded-3xl border border-white/10 bg-panel/80">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-950/40 text-left text-xs uppercase tracking-[0.2em] text-slate-500">
+          <tr>
+            <th class="px-4 py-3">Name</th>
+            <th class="px-4 py-3">Type</th>
+            <th class="px-4 py-3">Address</th>
+            <th class="px-4 py-3">Source</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Latency</th>
+            <th class="px-4 py-3">Egress IP</th>
+            <th class="px-4 py-3">Last check</th>
+            <th class="px-4 py-3">Fail streak</th>
+            <th class="px-4 py-3">Enabled</th>
+            <th class="px-4 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          {% for node in nodes %}
+            <tr class="align-top">
+              <td class="px-4 py-3">
+                <a href="/nodes/{{ node.id }}" class="font-medium text-slate-100 hover:text-white">{{ node.name }}</a>
+                {% if node.tags %}<p class="mt-1 text-xs text-slate-500">{{ node.tags }}</p>{% endif %}
+              </td>
+              <td class="px-4 py-3 text-slate-400">{{ node.protocol }}</td>
+              <td class="px-4 py-3 text-slate-400">{{ node.host }}:{{ node.port }}</td>
+              <td class="px-4 py-3 text-slate-400">{{ node.source_type }}</td>
+              <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs ring-1 {{ status_badge_class(node.current_status) }}">{{ node.current_status }}</span></td>
+              <td class="px-4 py-3 text-slate-400">{{ node.last_latency_ms|latency }}</td>
+              <td class="px-4 py-3 text-slate-400">{{ node.last_egress_ip or '—' }}</td>
+              <td class="px-4 py-3 text-slate-400">{{ node.last_check_finished_at|datetime }}</td>
+              <td class="px-4 py-3 text-slate-400">{{ node.fail_streak }}</td>
+              <td class="px-4 py-3 text-slate-400">{{ 'yes' if node.enabled else 'no' }}</td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-2">
+                  <form hx-post="/nodes/{{ node.id }}/check" hx-target="#nodes-table" hx-swap="outerHTML">
+                    <button type="submit" class="rounded-full border border-cyan-400/20 px-3 py-1 text-xs text-cyan-100 hover:bg-cyan-500/10">Check now</button>
+                  </form>
+                  <a href="/nodes/{{ node.id }}" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-200 hover:bg-white/10">View</a>
+                  <a href="/nodes/{{ node.id }}/edit" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-200 hover:bg-white/10">Edit</a>
+                  <form hx-post="/nodes/{{ node.id }}/toggle" hx-target="#nodes-table" hx-swap="outerHTML">
+                    <button type="submit" class="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-200 hover:bg-white/10">{{ 'Disable' if node.enabled else 'Enable' }}</button>
+                  </form>
+                  <form hx-post="/nodes/{{ node.id }}/delete" hx-target="#nodes-table" hx-swap="outerHTML" hx-confirm="Delete {{ node.name }}?">
+                    <button type="submit" class="rounded-full border border-rose-500/20 px-3 py-1 text-xs text-rose-200 hover:bg-rose-500/10">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="11" class="px-4 py-8 text-center text-sm text-slate-500">No nodes yet. Add a SOCKS5 proxy or import services from GOST.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

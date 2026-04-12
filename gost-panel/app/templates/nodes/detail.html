@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ node.name }} | {{ app_title }}{% endblock %}
+{% block content %}
+<section class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-semibold text-white">{{ node.name }}</h1>
+        <span class="rounded-full px-2.5 py-1 text-xs ring-1 {{ status_badge_class(node.current_status) }}">{{ node.current_status }}</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-400">{{ node.protocol }} at {{ node.host }}:{{ node.port }} from {{ node.source_type }}</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <form method="post" action="/nodes/{{ node.id }}/check">
+        <button type="submit" class="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-100 hover:bg-cyan-500/20">Check now</button>
+      </form>
+      <a href="/nodes/{{ node.id }}/edit" class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 hover:bg-white/10">Edit</a>
+      <a href="/nodes" class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 hover:bg-white/10">Back</a>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Last latency</p>
+      <p class="mt-3 text-2xl font-semibold text-white">{{ node.last_latency_ms|latency }}</p>
+    </article>
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Average latency</p>
+      <p class="mt-3 text-2xl font-semibold text-white">{{ metrics.avg_latency_ms|latency }}</p>
+    </article>
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Last success</p>
+      <p class="mt-3 text-base font-semibold text-white">{{ node.last_success_at|datetime }}</p>
+    </article>
+    <article class="rounded-3xl border border-white/10 bg-panel/80 p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Fail streak</p>
+      <p class="mt-3 text-2xl font-semibold text-white">{{ node.fail_streak }}</p>
+    </article>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-3">
+    <section class="rounded-3xl border border-white/10 bg-panel/80 p-5 xl:col-span-1">
+      <h2 class="text-lg font-semibold text-white">Current state</h2>
+      <dl class="mt-4 space-y-3 text-sm">
+        <div class="flex justify-between gap-4"><dt class="text-slate-500">Address</dt><dd class="text-slate-200">{{ node.host }}:{{ node.port }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-slate-500">Username</dt><dd class="text-slate-200">{{ node.username or '—' }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-slate-500">Password</dt><dd class="text-slate-200">{% if node.password %}stored{% else %}—{% endif %}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-slate-500">Egress IP</dt><dd class="text-slate-200">{{ node.last_egress_ip or '—' }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-slate-500">Last error</dt><dd class="text-slate-200 text-right">{{ node.last_error_message or '—' }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-slate-500">Failed stage</dt><dd class="text-slate-200">{{ node.last_failed_stage or '—' }}</dd></div>
+      </dl>
+      {% if node.notes %}
+        <div class="mt-5 rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm text-slate-300">{{ node.notes }}</div>
+      {% endif %}
+    </section>
+
+    <section class="rounded-3xl border border-white/10 bg-panel/80 p-5 xl:col-span-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-white">Recent checks</h2>
+        <span class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ checks|length }} rows</span>
+      </div>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="text-left text-xs uppercase tracking-[0.2em] text-slate-500">
+            <tr>
+              <th class="pb-3 pr-4">Started</th>
+              <th class="pb-3 pr-4">Finished</th>
+              <th class="pb-3 pr-4">Status</th>
+              <th class="pb-3 pr-4">Stage</th>
+              <th class="pb-3 pr-4">Latency</th>
+              <th class="pb-3 pr-4">Egress IP</th>
+              <th class="pb-3">Error</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {% for check in checks %}
+              <tr>
+                <td class="py-3 pr-4 text-slate-400">{{ check.started_at|datetime }}</td>
+                <td class="py-3 pr-4 text-slate-400">{{ check.finished_at|datetime }}</td>
+                <td class="py-3 pr-4"><span class="rounded-full px-2.5 py-1 text-xs ring-1 {{ status_badge_class(check.status) }}">{{ check.status }}</span></td>
+                <td class="py-3 pr-4 text-slate-400">{{ check.failed_stage or '—' }}</td>
+                <td class="py-3 pr-4 text-slate-400">{{ check.latency_ms|latency }}</td>
+                <td class="py-3 pr-4 text-slate-400">{{ check.egress_ip or '—' }}</td>
+                <td class="py-3 text-slate-400">{{ check.error_message or '—' }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="7" class="py-6 text-center text-sm text-slate-500">No checks stored yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>
+{% endblock %}
